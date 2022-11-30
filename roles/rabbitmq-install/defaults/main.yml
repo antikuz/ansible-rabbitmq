@@ -1,0 +1,43 @@
+rabbitmq_version: "3.9.7"
+erlang_version: "23.2.7"
+
+rabbitmq_admin_user: root
+rabbitmq_admin_pass: root
+
+# CHANGETHIS
+rabbitmq_erlang_cookie: "12345"
+
+# NOTE: Change root user/password and add other users if need
+rabbitmq_users:
+  - user: "{{ rabbitmq_admin_user }}"
+    password: "{{ rabbitmq_admin_pass }}"
+    vhost: /
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    tags: administrator
+
+rabbitmq_plugins: []
+# Example:
+  # - rabbitmq_management
+  # - rabbitmq_shovel
+  # - rabbitmq_shovel_management
+
+rabbitmq_env: 
+  RABBITMQ_MNESIA_BASE: /var/lib/rabbitmq/plugins
+
+rabbitmq_configuration: {}
+# Example:
+  # reverse_dns_lookups: false
+  # vm_memory_high_watermark_paging_ratio: 0.5
+  # log.channel.level: debug
+  # collect_statistics: coarse
+  # kernel.net_ticktime: 120
+
+rabbitmq_policies: []
+# Example:
+  # - policy_name: 'HA'
+  #   pattern: '^(?!amq\.).*'
+  #   tags:
+  #     ha-mode: 'all'
+  #     ha-sync-mode: 'automatic'

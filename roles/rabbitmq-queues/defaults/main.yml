@@ -1,0 +1,34 @@
+rabbitmq_admin_user: root
+rabbitmq_admin_pass: root
+
+rabbitmq_queues: []
+# Example:
+  # - queue_name    : "queue-1"
+  #   bindings:
+  #     - exchange      : "some-exchange-1"
+  #       routing_key   : "*.labels.generated"
+  #       state         : absent
+  #     - exchange      : "some-exchange-1"
+  #       routing_key   : "*.*.generated"
+  #       state         : present
+  # - queue_name    : "queue-2"
+  #   dead_letter_routing_key: direct
+  #   dead_letter_exchange: some-exchange-3
+  #   message_ttl: 1200000
+  #   bindings:
+  #     - exchange      : "some-exchange-1"
+  #       routing_key   : "*.labels.generated"
+  #       state         : absent
+  #     - exchange      : "some-exchange-1"
+  #       routing_key   : "*.*.generated"
+  #       state         : present
+
+rabbitmq_exchanges: []
+# Example:
+  # - exchange_name   : "some_exchange create"
+  #   state           : present
+  # - exchange_name   : "some_exchange create 2"
+  # - exchange_name   : "some_exchange delete"
+  #   vhost           : "/"
+  #   state           : absent
+

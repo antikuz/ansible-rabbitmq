@@ -1,0 +1,20 @@
+erlang_package_url: https://github.com/rabbitmq/erlang-rpm/releases/download/v{{ erlang_version }}/erlang-{{ erlang_version }}-1.el8.x86_64.rpm
+rabbitmq_package_url: https://github.com/rabbitmq/rabbitmq-server/releases/download/v{{ rabbitmq_version }}/rabbitmq-server-{{ rabbitmq_version }}-1.el8.noarch.rpm
+
+# need for python-requests
+python_urllib_package_url: https://yum.oracle.com/repo/OracleLinux/OL8/baseos/latest/x86_64/getPackage/python3-urllib3-1.23-5.el8.noarch.rpm
+python_pysocks_package_url: https://yum.oracle.com/repo/OracleLinux/OL8/baseos/latest/x86_64/getPackage/python3-pysocks-1.6.8-3.el8.noarch.rpm
+python_chardet_package_url: https://yum.oracle.com/repo/OracleLinux/OL8/baseos/latest/x86_64/getPackage/python3-chardet-3.0.4-7.el8.noarch.rpm
+
+# need for create queue by ansible rabbitmq module
+python_requests_package_url: https://yum.oracle.com/repo/OracleLinux/OL8/baseos/latest/x86_64/getPackage/python3-requests-2.20.0-2.1.el8_1.noarch.rpm
+
+# need for rabbitmq-server sometimes
+socat_package_url: https://yum.oracle.com/repo/OracleLinux/OL8/appstream/x86_64/getPackage/socat-1.7.3.2-6.el8.x86_64.rpm
+
+python_packages:
+  - "{{ python_urllib_package_url }}"
+  - "{{ python_pysocks_package_url }}"
+  - "{{ python_chardet_package_url }}"
+  - "{{ python_requests_package_url }}"
+

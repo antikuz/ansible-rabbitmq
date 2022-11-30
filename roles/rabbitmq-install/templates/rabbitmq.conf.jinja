@@ -1,0 +1,10 @@
+# Cluster configuration
+cluster_formation.peer_discovery_backend = classic_config
+
+{% for host in groups['rabbitmq_cluster'] %}
+cluster_formation.classic_config.nodes.{{ loop.index }} = rabbit@{{ hostvars[host]['ansible_facts']['hostname'] }}
+{% endfor %}
+
+{% for key, value in rabbitmq_configuration.items() %}
+{{ key }} = {{ value }}
+{% endfor %}

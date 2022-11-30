@@ -1,0 +1,27 @@
+erlang_package_url: https://github.com/rabbitmq/erlang-rpm/releases/download/v{{ erlang_version }}/erlang-{{ erlang_version }}-1.el7.x86_64.rpm
+rabbitmq_package_url: https://github.com/rabbitmq/rabbitmq-server/releases/download/v{{ rabbitmq_version }}/rabbitmq-server-{{ rabbitmq_version }}-1.el7.noarch.rpm
+
+# need for rabbitmq-server
+socat_package_url: https://yum.oracle.com/repo/OracleLinux/OL7/latest/x86_64/getPackage/socat-1.7.3.2-2.el7.x86_64.rpm
+
+# need for create queue by ansible rabbitmq module
+python_requests_package_url: https://yum.oracle.com/repo/OracleLinux/OL7/latest/x86_64/getPackage/python-requests-2.6.0-5.el7.noarch.rpm
+
+# need for python-requests
+python_urllib_package_url: https://yum.oracle.com/repo/OracleLinux/OL7/latest/x86_64/getPackage/python-urllib3-1.10.2-7.el7.noarch.rpm
+python_chardet_package_url: https://yum.oracle.com/repo/OracleLinux/OL7/latest/x86_64/getPackage/python-chardet-2.2.1-3.el7.noarch.rpm
+python_backports_url: https://yum.oracle.com/repo/OracleLinux/OL7/latest/x86_64/getPackage/python-backports-1.0-8.el7.x86_64.rpm
+python_backports_ssl_match_hostname_url: https://yum.oracle.com/repo/OracleLinux/OL7/latest/x86_64/getPackage/python-backports-ssl_match_hostname-3.5.0.1-1.el7.noarch.rpm
+python_ipaddress_url: https://yum.oracle.com/repo/OracleLinux/OL7/latest/x86_64/getPackage/python-ipaddress-1.0.16-2.el7.noarch.rpm
+python_six_url: https://yum.oracle.com/repo/OracleLinux/OL7/latest/x86_64/getPackage/python-six-1.9.0-2.el7.noarch.rpm
+python_requests_url: https://yum.oracle.com/repo/OracleLinux/OL7/latest/x86_64/getPackage/python-requests-2.6.0-5.el7.noarch.rpm
+
+python_packages:
+  - "{{ python_backports_url }}"
+  - "{{ python_backports_ssl_match_hostname_url }}"
+  - "{{ python_ipaddress_url }}"
+  - "{{ python_six_url }}"
+  - "{{ python_requests_url }}"
+  - "{{ python_urllib_package_url }}"
+  - "{{ python_chardet_package_url }}"
+  - "{{ python_requests_package_url }}"

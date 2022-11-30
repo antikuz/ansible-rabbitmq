@@ -1,0 +1,36 @@
+---
+- name: Create exchanges Rabbitmq
+  rabbitmq_exchange:
+    login_user: "{{ rabbitmq_admin_user }}"
+    login_password: "{{ rabbitmq_admin_pass }}"
+    vhost: "{{ item.vhost | default('/') }}"
+    name: "{{ item.exchange_name }}"
+    type: "{{ item.type | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ rabbitmq_exchanges }}"
+  run_once: yes
+
+- name: Create queues Rabbitmq
+  rabbitmq_queue:
+    login_user: "{{ rabbitmq_admin_user }}"
+    login_password: "{{ rabbitmq_admin_pass }}"
+    vhost: "{{ item.vhost | default('/') }}"
+    name: "{{ item.queue_name }}"
+    dead_letter_routing_key: "{{ item.dead_letter_routing_key | default(omit) }}"
+    dead_letter_exchange: "{{ item.dead_letter_exchange | default(omit) }}"
+    message_ttl: "{{ item.message_ttl | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ rabbitmq_queues }}"
+  run_once: yes
+
+- name: Create bindings Rabbitmq
+  rabbitmq_binding:
+    login_user: "{{ rabbitmq_admin_user }}"
+    login_password: "{{ rabbitmq_admin_pass }}"
+    vhost: "{{ item.1.vhost | default('/') }}"
+    name: "{{ item.1.exchange }}"
+    destination: "{{ item.0.queue_name }}"
+    routing_key: "{{ item.1.routing_key | default('#') }}"
+    destination_type: queue
+  loop: "{{ lookup('subelements', rabbitmq_queues, 'bindings', {'skip_missing': True}) }}"
+  run_once: yes

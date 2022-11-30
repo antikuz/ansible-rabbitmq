@@ -1,0 +1,132 @@
+---
+- name: Install RabbitMQ
+  tags: install
+  block:
+    - name: Import variables for rhel 8
+      include_vars: 
+        file: vars/rhel_8_urls.yml
+      when: ansible_facts["os_family"] == "RedHat" and ansible_facts["distribution_major_version"] == "8"
+
+    - name: Import variables for rhel 7
+      include_vars: 
+        file: vars/rhel_7_urls.yml
+      when: ansible_facts["os_family"] == "RedHat" and ansible_facts["distribution_major_version"] == "7"
+
+    - name: Install python packages
+      yum:
+        name: "{{ python_packages }}"
+        state: present
+
+    - name: Install sockat package
+      yum:
+        name: "{{ socat_package_url }}"     # package socat needed by rabbitmq-server sometime
+        state: present
+
+    - name: Install RabbitMQ and Erlang
+      yum:
+        name:
+          - "{{ erlang_package_url }}"
+          - "{{ rabbitmq_package_url }}"
+        state: present
+
+- name: Add RabbitMQ servers to /etc/hosts
+  lineinfile:
+    path: "/etc/hosts"
+    regexp: "^{{ hostvars[item]['ansible_facts']['default_ipv4']['address'] }}"
+    line: >
+      {{ hostvars[item]['ansible_facts']['default_ipv4']['address'] }}
+      {{ hostvars[item]['ansible_facts']['hostname'] }}
+      {{ hostvars[item]['ansible_facts']['fqdn'] }}
+  loop: "{{ ansible_play_hosts_all }}"
+
+- name: Ensure rabbitmq lib dir exists [/var/lib/rabbitmq/]
+  file:
+    path: /var/lib/rabbitmq/
+    state: directory
+    owner: rabbitmq
+    group: rabbitmq
+    mode: 0755
+
+- name: Copy erlang cookie
+  copy:
+    content: "{{ rabbitmq_erlang_cookie }}"
+    dest: /var/lib/rabbitmq/.erlang.cookie
+    owner: rabbitmq
+    group: rabbitmq
+    mode: 0400
+
+- name: Render RabbitMQ config /etc/rabbitmq/rabbitmq.conf
+  template:
+    src: rabbitmq.conf.jinja
+    dest: /etc/rabbitmq/rabbitmq.conf
+    owner: rabbitmq
+    group: rabbitmq
+    mode: 0644
+  notify: restart rabbitmq
+
+- name: Render RabbitMQ environment /etc/rabbitmq/rabbitmq-env.conf
+  template:
+    src: rabbitmq-env.conf.jinja
+    dest: /etc/rabbitmq/rabbitmq-env.conf
+    owner: rabbitmq
+    group: rabbitmq
+    mode: 0644
+  when: rabbitmq_env is defined
+  notify: restart rabbitmq
+
+- name: Create MNESIA directory {{ rabbitmq_env['RABBITMQ_MNESIA_BASE'] }}
+  file:
+    path: "{{ rabbitmq_env['RABBITMQ_MNESIA_BASE'] }}"
+    state: directory
+    owner: rabbitmq
+    group: rabbitmq
+    mode: 0755
+
+- name: Started RabbitMQ cluster
+  systemd:
+    name: rabbitmq-server
+    enabled: yes
+    state: started
+
+- name: Configure RabbitMQ policies
+  rabbitmq_policy:
+    name: "{{ item.policy_name }}"
+    node: "{{ item.node | default('rabbit') }}"
+    apply_to: "{{ item.apply_to | default('all') }}"
+    state: "{{ item.state | default('present') }}"
+    vhost: "{{ item.vhost | default('/') }}"
+    pattern: "{{ item.pattern }}"
+    tags: "{{ item.tags }}"
+  loop: "{{ rabbitmq_policies }}"
+  when: rabbitmq_policies is defined
+  run_once: yes
+
+- name: Remove RabbitMQ guest user
+  rabbitmq_user:
+    user: guest
+    state: absent
+  run_once: yes
+  no_log: true  # dont show log because password will be in plain text
+
+- name: Configure RabbitMQ users
+  rabbitmq_user:
+    user: "{{ item.user }}"
+    password: "{{ item.password }}"
+    configure_priv: "{{ item.configure_priv | default('.*') }}"
+    read_priv: "{{ item.read_priv | default('.*') }}"
+    write_priv: "{{ item.write_priv | default('.*') }}"
+    vhost: "{{ item.vhost | default('/') }}"
+    permissions: "{{ item.permissions | default(omit) }}"
+    tags: "{{ item.tags | default('') }}"
+    update_password: always
+  loop: "{{ rabbitmq_users }}"
+  run_once: yes
+  no_log: true  # dont show log because password will be in plain text
+
+- name: Enable RabbitMQ plugins
+  rabbitmq_plugin:
+    names: "{{ item }}"
+    state: enabled
+    new_only: yes  
+  loop: "{{ rabbitmq_plugins }}"
+  when: rabbitmq_plugins is defined
